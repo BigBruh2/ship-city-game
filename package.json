@@ -1,0 +1,8 @@
+{
+    "name": "ship-city-game",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "echo 'Local dev not configured'"
+    }
+}
