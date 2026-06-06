@@ -1,9 +1,0 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyAyvJpgm3j1o5BDiNCGhz61GBQLm_NHBp4",
-  authDomain: "ship-city-game.firebaseapp.com",
-  databaseURL: "https://ship-city-game-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "ship-city-game",
-  storageBucket: "ship-city-game.firebasestorage.app",
-  messagingSenderId: "382891214432",
-  appId: "1:382891214432:web:a02782cf3d5d39009b6505",
-  measurementId: "G-LVLDB1PNJ1"
