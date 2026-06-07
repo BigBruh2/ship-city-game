@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Users, AlertCircle, MapPin, LogOut } from 'lucide-react';
-import DialogueScreen from './components/DialogueScreen';
-import EventScreen from './components/EventScreen';
-import { npcs, getAvailableDialogue } from './data/npcs';
-import { dialogues } from './data/dialogues';
-import { worldEvents, getTriggeredEvents } from './data/worldEvents';
+import DialogueScreen from './components/DialogueScreen.jsx';
+import EventScreen from './components/EventScreen.jsx';
+import { npcs, getAvailableDialogue } from './data/npcs.js';
+import { dialogues } from './data/dialogues.js';
+import { worldEvents, getTriggeredEvents } from './data/worldEvents.js';
 
 const defaultGameState = {
   turn: 1,
