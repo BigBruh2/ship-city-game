@@ -1,30 +1,24 @@
 const simulateOtherPlayersAction = () => {
-    // Show system notification
-    setSystemNotification('Other players are taking actions...');
+    const otherPlayerActions = [
+      `🎭 Sarah spoke with Captain Voss: "I support whatever keeps this ship running"`,
+      `🎭 Viktor spoke with Marcus Steel: "How can I help?"`,
+      `🎭 Sarah spoke with Lucia Reeves: "I'm interested in business"`,
+      `🎭 Viktor spoke with The Collective: "Show me something important"`,
+      `📊 Sarah moved to Lower Deck`,
+      `📊 Viktor moved to Upper Deck`,
+      `💡 Sarah is gathering intelligence...`,
+      `💪 Viktor is recruiting followers...`,
+    ];
     
-    // After 1.5 seconds, show their actions
-    setTimeout(() => {
-      const otherPlayerActions = [
-        `🎭 Sarah spoke with Captain Voss: "I support whatever keeps this ship running"`,
-        `🎭 Viktor spoke with Marcus Steel: "How can I help?"`,
-        `🎭 Sarah spoke with Lucia Reeves: "I'm interested in business"`,
-        `🎭 Viktor spoke with The Collective: "Show me something important"`,
-        `📊 Sarah moved to Lower Deck`,
-        `📊 Viktor moved to Upper Deck`,
-        `💡 Sarah is gathering intelligence...`,
-        `💪 Viktor is recruiting followers...`,
-      ];
-      
-      // Pick 1-2 random actions
-      const numActions = Math.random() > 0.6 ? 2 : 1;
-      const actions = [];
-      for (let i = 0; i < numActions; i++) {
-        actions.push(otherPlayerActions[Math.floor(Math.random() * otherPlayerActions.length)]);
-      }
-      
-      setSharedActionLog(prev => [...prev, ...actions]);
-      setSystemNotification(null);
-    }, 1500);
+    // Pick 1-2 random actions
+    const numActions = Math.random() > 0.6 ? 2 : 1;
+    const actions = [];
+    for (let i = 0; i < numActions; i++) {
+      actions.push(otherPlayerActions[Math.floor(Math.random() * otherPlayerActions.length)]);
+    }
+    
+    // Add actions to shared log
+    setSharedActionLog(prev => [...prev, ...actions]);
   };
 
   const leaveGame = () => {
@@ -234,9 +228,6 @@ export default function App() {
     'Game started. Multiple players online.',
   ]);
   
-  // System notification
-  const [systemNotification, setSystemNotification] = useState(null);
-  
   // Simulated other players
   const [otherPlayers] = useState([
     { id: 'p2', name: 'Sarah', deck: 'upper', status: 'In negotiation' },
@@ -350,13 +341,6 @@ export default function App() {
           onClose={() => setCurrentDialogueNpc(null)}
           loyalty={gameState.loyalty[currentDialogueNpc.id]}
         />
-      )}
-
-      {/* System Notification */}
-      {systemNotification && (
-        <div className="fixed top-4 left-4 right-4 bg-blue-900 border border-blue-500 rounded-lg p-4 text-center animate-pulse z-40">
-          <p className="text-sm font-semibold text-blue-200">{systemNotification}</p>
-        </div>
       )}
 
       <div className="max-w-3xl mx-auto mb-6">
@@ -490,7 +474,7 @@ export default function App() {
         >
           End Turn (Turn {gameState.turn} → {gameState.turn + 1})
         </button>
-        <p className="text-xs text-slate-400 text-center mt-2">💬 Hint: Watch the top of the screen when you end turn!</p>
+        <p className="text-xs text-slate-400 text-center mt-2">📝 Other players will take actions - check the log below!</p>
       </div>
     </div>
   );
