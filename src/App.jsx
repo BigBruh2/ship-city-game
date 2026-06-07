@@ -1,4 +1,32 @@
-import React, { useState } from 'react';
+const simulateOtherPlayersAction = () => {
+    // Simulate random other players taking actions
+    const otherPlayerActions = [
+      `🎭 Sarah spoke with Captain Voss: "I support whatever keeps this ship running"`,
+      `🎭 Viktor spoke with Marcus Steel: "How can I help?"`,
+      `🎭 Sarah spoke with Lucia Reeves: "I'm interested in business"`,
+      `🎭 Viktor spoke with The Collective: "Show me something important"`,
+      `📊 Sarah moved to Lower Deck`,
+      `📊 Viktor moved to Upper Deck`,
+      `💡 Sarah is gathering intelligence...`,
+      `💪 Viktor is recruiting followers...`,
+    ];
+    
+    // Pick 1-2 random actions
+    const numActions = Math.random() > 0.6 ? 2 : 1;
+    const actions = [];
+    for (let i = 0; i < numActions; i++) {
+      actions.push(otherPlayerActions[Math.floor(Math.random() * otherPlayerActions.length)]);
+    }
+    
+    setSharedActionLog(prev => [...prev, ...actions]);
+  };
+
+  const leaveGame = () => {
+    setGamePhase('lobby');
+    setPlayerName('');
+    setSessionCode('');
+    setCurrentDialogueNpc(null);
+  };import React, { useState } from 'react';
 import { Users, AlertCircle, MapPin, LogOut, X } from 'lucide-react';
 
 // NPC Data (inline)
@@ -194,6 +222,17 @@ export default function App() {
 
   const [currentDialogueNpc, setCurrentDialogueNpc] = useState(null);
   const [dialogueIndex, setDialogueIndex] = useState(0);
+  
+  // Shared action log for all players
+  const [sharedActionLog, setSharedActionLog] = useState([
+    'Game started. Multiple players online.',
+  ]);
+  
+  // Simulated other players
+  const [otherPlayers] = useState([
+    { id: 'p2', name: 'Sarah', deck: 'upper', status: 'In negotiation' },
+    { id: 'p3', name: 'Viktor', deck: 'lower', status: 'Gathering intel' },
+  ]);
 
   const locations = {
     upper: [
@@ -221,14 +260,20 @@ export default function App() {
       Math.min(20, newLoyalty[currentDialogueNpc.id] + choice.loyaltyChange)
     );
 
-    // Update log
+    // Update local log
     const newLog = [...gameState.log, `${playerName} spoke with ${currentDialogueNpc.name}: "${choice.text}"`];
+
+    // Add to SHARED log (visible to all players)
+    const sharedAction = `🎭 ${playerName} spoke with ${currentDialogueNpc.name}: "${choice.text}"`;
+    const newSharedLog = [...sharedActionLog, sharedAction];
 
     setGameState(prev => ({
       ...prev,
       loyalty: newLoyalty,
       log: newLog,
     }));
+    
+    setSharedActionLog(newSharedLog);
 
     // Move to next dialogue or close
     if (dialogueIndex < dialogues[currentDialogueNpc.id].length - 1) {
@@ -310,11 +355,18 @@ export default function App() {
         </div>
 
         <div className="bg-slate-700 p-3 rounded mb-4">
-          <p className="text-xs text-slate-400 mb-2">Players ({players.length}):</p>
-          <div className="flex flex-wrap gap-2">
-            {players.map(p => (
-              <div key={p.id} className="text-xs bg-slate-800 px-2 py-1 rounded text-cyan-300">
-                {p.name}
+          <p className="text-xs text-slate-400 mb-2">Players in Session ({players.length + otherPlayers.length}):</p>
+          <div className="space-y-1">
+            {/* Your player */}
+            <div className="flex justify-between items-center text-xs bg-slate-800 px-2 py-1 rounded text-cyan-300">
+              <span>👤 {playerName} (You)</span>
+              <span className="text-slate-500">🏛️ {gameState.deck}</span>
+            </div>
+            {/* Other players */}
+            {otherPlayers.map(p => (
+              <div key={p.id} className="flex justify-between items-center text-xs bg-slate-800 px-2 py-1 rounded text-amber-300">
+                <span>👥 {p.name}</span>
+                <span className="text-slate-500">{p.status}</span>
               </div>
             ))}
           </div>
@@ -397,24 +449,32 @@ export default function App() {
       {/* Game Log */}
       <div className="max-w-3xl mx-auto mb-6">
         <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
-          <AlertCircle size={20} /> Events
+          <AlertCircle size={20} /> Shared Game Log (All Players)
         </h2>
-        <div className="bg-slate-800 rounded p-4 border border-slate-700 text-xs max-h-40 overflow-y-auto">
-          {gameState.log.slice(-5).reverse().map((entry, i) => (
-            <p key={i} className="text-slate-300 mb-2 italic">{entry}</p>
-          ))}
+        <div className="bg-slate-800 rounded p-4 border border-slate-700 text-xs max-h-48 overflow-y-auto space-y-1">
+          {sharedActionLog.length === 0 ? (
+            <p className="text-slate-500 italic">No actions yet...</p>
+          ) : (
+            sharedActionLog.slice(-10).reverse().map((action, i) => (
+              <p key={i} className="text-slate-300">{action}</p>
+            ))
+          )}
         </div>
       </div>
 
       {/* Turn Control */}
       <div className="max-w-3xl mx-auto">
         <button
-          onClick={() => setGameState(prev => ({ ...prev, turn: prev.turn + 1 }))}
+          onClick={() => {
+            setGameState(prev => ({ ...prev, turn: prev.turn + 1 }));
+            simulateOtherPlayersAction();
+          }}
           disabled={currentDialogueNpc !== null}
           className="w-full p-3 bg-green-700 hover:bg-green-600 disabled:bg-slate-600 font-semibold rounded transition"
         >
           End Turn (Turn {gameState.turn} → {gameState.turn + 1})
         </button>
+        <p className="text-xs text-slate-500 text-center mt-2">Other players will also take actions...</p>
       </div>
     </div>
   );
